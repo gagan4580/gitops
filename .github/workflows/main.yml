@@ -1,0 +1,27 @@
+name: ArgoCD Deployment
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Deploy with ArgoCD
+      run: |
+        # Install the ArgoCD CLI
+        curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+        chmod +x /usr/local/bin/argocd
+
+        # Set up ArgoCD connection
+        argocd login --insecure --username admin --password GscA4ryV1SNXPpYL --grpc-web localhost:8081
+        argocd cluster add https://kubernetes.default.svc
+
+        # Sync the application
+        argocd app sync my-app --wait
