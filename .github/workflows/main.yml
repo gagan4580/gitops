@@ -24,7 +24,7 @@ jobs:
           chmod +x /usr/local/bin/argocd
 
           # Set up ArgoCD connection
-          argocd login --insecure --username admin --password GscA4ryV1SNXPpYL --grpc-web localhost:8081
+          argocd login --insecure --username admin --password GscA4ryV1SNXPpYL --grpc-web http://localhost:8081
           argocd cluster add https://kubernetes.default.svc
 
           # Sync the application
