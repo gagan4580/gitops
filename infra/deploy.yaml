@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-react-app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-react-app
+  template:
+    metadata:
+      labels:
+        app: my-react-app
+    spec:
+      containers:
+        - name: my-react-app-container
+          image: 27564580/my-react-app:latest
+        
