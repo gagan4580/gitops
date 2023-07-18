@@ -43,17 +43,14 @@ jobs:
           password: ${{ secrets.G_TOKEN }}
 
       - name: Build and Push Docker image
-        env:
-          DOCKER_IMAGE: 27564580/my-react-app:latest
-          DOCKERFILE_PATH: Dockerfile
-        run: |
-          docker build -t $DOCKER_IMAGE -f $DOCKERFILE_PATH .
-          docker push $DOCKER_IMAGE
+        uses: docker/build-push-action@v2
+        with:
+          context: ./
+          tags: |
+            docker.pkg.github.com/gagan4580/my-react-app:${{ github.sha }}
+            27564580/my-react-app:${{ github.sha }}
+            27564580/my-react-app:latest
+          push: ${{ github.ref == 'refs/heads/master' }}
 
-      - name: Tag and Push Docker image to GitHub Container Registry
-        env:
-          DOCKER_IMAGE: 27564580/my-react-app:latest
-          IMAGE_TAG_SHA: ${{ github.sha }}
-        run: |
-          docker tag $DOCKER_IMAGE docker.pkg.github.com/gagan4580/my-react-app/${{ github.repository }}:${IMAGE_TAG_SHA}
-          docker push docker.pkg.github.com/gagan4580/my-react-app/${{ github.repository }}:${IMAGE_TAG_SHA}
+      - name: Image Digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
