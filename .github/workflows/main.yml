@@ -15,3 +15,7 @@ test:
   script:
     - npm install
     - npm test
+
+# Only trigger the pipeline on pushes to the master branch
+only:
+  - master
