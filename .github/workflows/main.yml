@@ -67,5 +67,5 @@ jobs:
 
     - name: Update Argo CD application
       run: |
-        argocd login http://localhost/ --username admin --password GscA4ryV1SNXPpYL --insecure
+        argocd login http://localhost --username admin --password GscA4ryV1SNXPpYL --insecure
         argocd app set my-app --sync-option Prune=true
