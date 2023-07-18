@@ -1,21 +1,36 @@
-stages:
-  - build
-  - test
+name: Build and Publish
 
-build:
-  stage: build
-  image: node:lts
-  script:
-    - npm install
-    - npm run build
+on:
+  push:
+    branches:
+      - master
 
-test:
-  stage: test
-  image: node:lts
-  script:
-    - npm install
-    - npm test
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-# Only trigger the pipeline on pushes to the master branch
-only:
-  - master
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build
+      run: npm run build
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
