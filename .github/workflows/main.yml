@@ -69,6 +69,6 @@ jobs:
 
       - name: Update Argo CD application
         run: |
-          kubectl port-forward svc/argocd-server -n argocd 8081:443 &
-          argocd login 127.0.0.1:8081 --username admin --password GscA4ryV1SNXPpYL --insecure
+          kubectl port-forward svc/argocd-server -n argocd 8082:443 &
+          argocd login 127.0.0.1:8082 --username admin --password GscA4ryV1SNXPpYL --insecure
           argocd app set my-app --sync-option Prune=true
