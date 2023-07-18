@@ -1,31 +1,84 @@
-name: ArgoCD Deployment
+name: Build and Test
 
 on:
   push:
     branches:
-      - master
+      - main
+  pull_request:
+    branches:
+      - feature/*
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Get Git Commit SHA
-        id: git_commit_sha
-        run: echo ::set-output name=commit_sha::$(git rev-parse HEAD)
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
 
-      - name: Deploy with ArgoCD
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Login to GitHub Packages
+        uses: docker/login-action@v1
+        with:
+          registry: docker.pkg.github.com
+          username: ${{ github.actor }}
+          password: ${{ secrets.G_TOKEN }}
+
+      - name: Build and Push Docker image
+        env:
+          IMAGE_TAG_SHA: ${{ github.sha }}
+          IMAGE_TAG_LATEST: latest
         run: |
-          # Install the ArgoCD CLI
-          curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
-          chmod +x /usr/local/bin/argocd
+          docker build -t 27564580/gitops:${IMAGE_TAG_SHA} .
+          docker build -t 27564580/gitops:${IMAGE_TAG_LATEST} .
+          docker push 27564580/gitops:${IMAGE_TAG_SHA}
+          docker push 27564580/gitops:${IMAGE_TAG_LATEST}
 
-          # Set up ArgoCD connection
-          argocd login --insecure --username admin --password GscA4ryV1SNXPpYL --grpc-web http://localhost:8081
-          argocd cluster add https://kubernetes.default.svc
-
-          # Sync the application
-          argocd app sync my-app --revision ${{ steps.git_commit_sha.outputs.commit_sha }} --wait
+      - name: Tag and Push Docker image to GitHub Container Registry
+        env:
+          IMAGE_TAG_SHA: ${{ github.sha }}
+          IMAGE_TAG_LATEST: latest
+        run: |
+          docker tag 27564580/gitops:${IMAGE_TAG_SHA} docker.pkg.github.com/gagan4580/gitops/${{ github.repository }}:${IMAGE_TAG_SHA}
+          docker tag 27564580/gitops:${IMAGE_TAG_SHA} docker.pkg.github.com/gagan4580/gitops/${{ github.repository }}:${IMAGE_TAG_LATEST}
+          docker push docker.pkg.github.com/gagan4580/gitops/${{ github.repository }}:${IMAGE_TAG_SHA}
+          docker push docker.pkg.github.com/gagan4580/gitops/${{ github.repository }}:${IMAGE_TAG_LATEST}
