@@ -58,7 +58,7 @@ jobs:
           context: ./
           tags: |
             27564580/my-react-app:${{ github.sha }}
-            ghcr.io/gagan4580/gitops/my-react-app:${{ github.sha }}
+            ghcr.io/gagan4580/my-react-app:${{ github.sha }}
           push: ${{ github.ref == 'refs/heads/master' }}
 
       - name: Image digest
