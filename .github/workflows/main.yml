@@ -81,7 +81,7 @@ jobs:
           git config --global user.email "gagan4580@yahoo.com"
           git config --global user.name "gagan4580"
           echo ${{ github.sha }}
-          sed -i "s#${{ github.actor }}.*#${{ github.actor }}/gitops:${{ github.sha }}#g" deploy.yaml
+          sed -i "s#${{ github.actor }}.*#${{ github.actor }}/my-react-app:${{ github.sha }}#g" deploy.yaml
           git add -A
           git commit -am "Update image for - ${{ github.sha }}"
       - run: echo ${{ github }}
