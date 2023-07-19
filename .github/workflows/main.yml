@@ -66,8 +66,8 @@ jobs:
           context: ./
           # Note: tags has to be all lower-case
           tags: |
-            gagan4580/gitops:${{ github.sha }} 
-            ghcr.io/gagan4580/gitops:${{ github.sha }}
+            27564580/my-react-app:${{ github.sha }} 
+            ghcr.io/gagan4580/27564580/my-react-app:${{ github.sha }}
           # build on feature branches, push only on main branch
           push: ${{ github.ref == 'refs/heads/master' }}
 
