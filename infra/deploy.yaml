@@ -14,5 +14,5 @@ spec:
     spec:
       containers:
         - name: my-react-app-container
-          image: 27564580/my-react-app:latest
+          image: image: 27564580/my-react-app:sha-<commit-sha>
         
