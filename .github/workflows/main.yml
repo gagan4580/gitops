@@ -1,5 +1,3 @@
-name: Continuous Integration
-
 on:
   push:
     branches:
@@ -31,3 +29,25 @@ jobs:
         run: |
           docker build -t ghcr.io/gagan4580/27564580/my-react-app:latest .
           docker push ghcr.io/gagan4580/27564580/my-react-app:latest
+
+  update-manifest-stage:
+    runs-on: ubuntu-latest
+    needs: ['Build and push Docker image']
+
+    steps:
+     - uses: actions/checkout@v3
+        with:
+          repository: gagan4580/gitops-infra
+          ref: master
+          token: ${{ secrets.G_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "gagan4580@yahoo.com"
+          git config --global user.name "gagan4580"
+          echo ${{ github.sha }}      
+          sed -i "s#${{ github.actor }}.*#${{ github.actor }}/gitops:${{ github.sha }}#g" deploy.yaml
+          git add -A
+          git commit -am "update image for - ${{ github.sha }}"
+      - run: echo ${{ github }}
+      - run: git push origin main
