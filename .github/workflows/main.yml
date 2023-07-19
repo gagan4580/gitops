@@ -90,6 +90,6 @@ jobs:
         run: |
           git config --global user.email "gagan4580@yahoo.com"
           git config --global user.name "gagan4580"
-          git add path/to/your/deploy/file.yaml
+          git add -A
           git commit -m "Update image for - ${{ steps.docker_build.outputs.digest }}"
           git push origin master
