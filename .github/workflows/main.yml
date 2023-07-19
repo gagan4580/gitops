@@ -1,4 +1,4 @@
-name: Build Step
+name: CI Pipeline
 
 on:
   push:
@@ -71,12 +71,16 @@ jobs:
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
+        id: image_digest
+        env:
+          IMAGE_DIGEST: ${{ steps.docker_build.outputs.digest }}
 
   update-deploy-file:
     runs-on: ubuntu-latest
     needs: ['build-and-push-docker-image']
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout gitops-infra
+        uses: actions/checkout@v3
         with:
           repository: gagan4580/gitops-infra
           ref: 'master'
@@ -84,12 +88,12 @@ jobs:
 
       - name: Update Deployment File
         run: |
-          sed -i "s#27564580/my-react-app:[0-9a-f]*#27564580/my-react-app:${{ steps.docker_build.outputs.digest }}#" deploy.yaml
+          sed -i "s#27564580/my-react-app:[0-9a-f]*#27564580/my-react-app:${{ needs.build-and-push-docker-image.outputs['image_digest'] }}#" deploy.yaml
 
       - name: Commit and Push Changes
         run: |
           git config --global user.email "gagan4580@yahoo.com"
           git config --global user.name "gagan4580"
-          git add -A
-          git commit -m "Update image for - ${{ steps.docker_build.outputs.digest }}"
+          git add deploy.yaml
+          git commit -m "Update image for - ${{ needs.build-and-push-docker-image.outputs['image_digest'] }}"
           git push origin master
