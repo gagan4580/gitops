@@ -39,7 +39,7 @@ jobs:
       - name: Checkout gitops-infra repository
         uses: actions/checkout@v3
         with:
-          repository: gagan4580/gitops-infra
+          repository: https://github.com/gagan4580/gitops-infra.git
           ref: master
         env:
           GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
